@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigation } from "@react-navigation/core";
 import { useState } from "react";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import Constants from "expo-constants";
 import axios from "axios";
 
 import {
@@ -13,9 +14,10 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
+  SafeAreaView,
 } from "react-native";
 
-export default function SignUpScreen({ setToken }) {
+const SignUpScreen = ({ setToken }) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,11 +29,35 @@ export default function SignUpScreen({ setToken }) {
   );
   const navigation = useNavigation();
 
-  const handleSubmit = () => {
-    alert("coucou");
+  const handleSignup = async () => {
+    if (!(username || email || password || describe || confirm)) {
+      setMessage("Fill in all fields");
+    } else if (password !== confirm) {
+      setMessage("Passwords doesn't match");
+    } else {
+      const params = {
+        email: email,
+        username: username,
+        password: password,
+        description: describe,
+      };
+      try {
+        const response = await axios.post(
+          "https://express-airbnb-api.herokuapp.com/user/sign_up",
+          params
+        );
+        console.log("post");
+        console.log(response.data);
+        setToken(response.data.token);
+      } catch (error) {
+        console.log("err");
+        console.log(error.message);
+      }
+    }
   };
   return (
-    <KeyboardAwareScrollView>
+    // <KeyboardAwareScrollView>
+    <SafeAreaView style={styles.safeAreaView}>
       <ScrollView style={styles.scrollView}>
         <StatusBar style="dark" />
         <View style={styles.main}>
@@ -77,7 +103,7 @@ export default function SignUpScreen({ setToken }) {
             secureTextEntry={true}
           />
           <Text style={styles.message}>{message}</Text>
-          <TouchableOpacity style={styles.btn} onPress={handleSubmit}>
+          <TouchableOpacity style={styles.btn} onPress={handleSignup}>
             <Text style={styles.signup_btn}>Sign Up</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -91,11 +117,17 @@ export default function SignUpScreen({ setToken }) {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </KeyboardAwareScrollView>
+    </SafeAreaView>
+    // </KeyboardAwareScrollView>
   );
-}
+};
+
+export default SignUpScreen;
 
 const styles = StyleSheet.create({
+  safeAreaView: {
+    backgroundColor: "white",
+  },
   //-----------------scrolview------------------------
   scrollView: {
     backgroundColor: "white",
@@ -103,7 +135,7 @@ const styles = StyleSheet.create({
 
   main: {
     paddingHorizontal: 40,
-    marginTop: 80,
+    marginTop: 60,
     alignItems: "center",
   },
   logo: {
@@ -116,6 +148,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   input: {
+    textTransform: "lowercase",
     width: "100%",
     borderBottomColor: "#FFBAC0",
     borderBottomWidth: 2,
@@ -139,9 +172,11 @@ const styles = StyleSheet.create({
   signup_btn: {
     fontSize: 20,
     paddingHorizontal: 60,
-    paddingVertical: 13,
+    paddingVertical: 10,
   },
   btn: {
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 60,
     borderColor: "#F9585C",
     borderWidth: 2,
@@ -150,6 +185,6 @@ const styles = StyleSheet.create({
   },
   bottom_text: {
     marginTop: 20,
-    marginBottom: 90,
+    marginBottom: 30,
   },
 });

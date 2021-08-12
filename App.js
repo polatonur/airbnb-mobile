@@ -3,12 +3,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import HomeScreen from "./containers/HomeScreen";
 import ProfileScreen from "./containers/ProfileScreen";
 import SignInScreen from "./containers/SignInScreen";
 import SignUpScreen from "./containers/SignUpScreen";
 import SettingsScreen from "./containers/SettingsScreen";
+import HeaderLogo from "./components/HaeaderLogo";
+import RoomScreen from "./containers/RoomScreen";
+import AroundMe from "./containers/AroundMeScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -18,6 +21,7 @@ export default function App() {
   const [userToken, setUserToken] = useState(null);
 
   const setToken = async (token) => {
+    console.log("token");
     if (token) {
       AsyncStorage.setItem("userToken", token);
     } else {
@@ -83,12 +87,18 @@ export default function App() {
                       <Stack.Screen
                         name="Home"
                         options={{
-                          title: "My App",
-                          headerStyle: { backgroundColor: "red" },
-                          headerTitleStyle: { color: "white" },
+                          headerTitle: (props) => <HeaderLogo {...props} />,
                         }}
                       >
-                        {() => <HomeScreen />}
+                        {(props) => <HomeScreen {...props} />}
+                      </Stack.Screen>
+                      <Stack.Screen
+                        name="Room"
+                        options={{
+                          headerTitle: (props) => <HeaderLogo {...props} />,
+                        }}
+                      >
+                        {(props) => <RoomScreen {...props} />}
                       </Stack.Screen>
 
                       <Stack.Screen
@@ -103,12 +113,38 @@ export default function App() {
                   )}
                 </Tab.Screen>
                 <Tab.Screen
+                  name="Around me"
+                  options={{
+                    tabBarLabel: "Around me",
+                    tabBarIcon: ({ color, size }) => (
+                      <MaterialCommunityIcons
+                        name="map-marker-outline"
+                        size={size}
+                        color={color}
+                      />
+                    ),
+                  }}
+                >
+                  {() => (
+                    <Stack.Navigator>
+                      <Stack.Screen
+                        name="AroundMe"
+                        options={{
+                          headerTitle: (props) => <HeaderLogo {...props} />,
+                        }}
+                      >
+                        {(props) => <AroundMe {...props} />}
+                      </Stack.Screen>
+                    </Stack.Navigator>
+                  )}
+                </Tab.Screen>
+                <Tab.Screen
                   name="Settings"
                   options={{
                     tabBarLabel: "Settings",
                     tabBarIcon: ({ color, size }) => (
-                      <Ionicons
-                        name={"ios-options"}
+                      <MaterialCommunityIcons
+                        name="account-outline"
                         size={size}
                         color={color}
                       />

@@ -5,34 +5,31 @@ import { styleSheets } from "min-document";
 import { StyleSheet, View, ActivityIndicator } from "react-native";
 import React from "react";
 
-const Map = ({ array }) => {
+const Map = ({ array, longitude, latitude }) => {
   const [error, setError] = useState();
-  const [isLoading, setIsLoading] = useState(true);
-  const [latitude, setLatitude] = useState(null);
-  const [longitude, setLongitude] = useState(null);
 
-  useEffect(() => {
-    const getPermission = async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        console.log(status);
+  //   useEffect(() => {
+  //     const getPermission = async () => {
+  //       try {
+  //         const { status } = await Location.requestForegroundPermissionsAsync();
+  //         console.log(status);
 
-        if (status === "granted") {
-          const location = await Location.getCurrentPositionAsync();
-          setLatitude(location.coords.latitude);
-          setLongitude(location.coords.longitude);
-          console.log(location.coords);
-          setIsLoading(false);
-        } else {
-          alert("Permission refusée");
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  //         if (status === "granted") {
+  //           const location = await Location.getCurrentPositionAsync();
+  //           setLatitude(location.coords.latitude);
+  //           setLongitude(location.coords.longitude);
+  //           console.log(location.coords);
+  //           setIsLoading(false);
+  //         } else {
+  //           alert("Permission refusée");
+  //         }
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     };
 
-    getPermission();
-  }, []);
+  //     getPermission();
+  //   }, []);
 
   array.forEach((elem) => {
     console.log(elem.location);
@@ -53,13 +50,15 @@ const Map = ({ array }) => {
         }}
       >
         {array.map((elem, index) => {
-          <MapView.Marker
-            coordinate={{
-              latitude: elem.location[1],
-              longitude: elem.location[0],
-            }}
-            key={index}
-          />;
+          return (
+            <MapView.Marker
+              coordinate={{
+                latitude: elem.location[1],
+                longitude: elem.location[0],
+              }}
+              key={index}
+            />
+          );
         })}
       </MapView>
     </View>
@@ -67,10 +66,3 @@ const Map = ({ array }) => {
 };
 
 export default Map;
-
-const styles = StyleSheet.create({
-  map: {
-    width: "100%",
-    height: "100%",
-  },
-});

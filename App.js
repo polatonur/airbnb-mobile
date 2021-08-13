@@ -12,6 +12,7 @@ import SettingsScreen from "./containers/SettingsScreen";
 import HeaderLogo from "./components/HaeaderLogo";
 import RoomScreen from "./containers/RoomScreen";
 import AroundMe from "./containers/AroundMeScreen";
+import BackArrow from "./components/BackArrow";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -96,6 +97,7 @@ export default function App() {
                         name="Room"
                         options={{
                           headerTitle: (props) => <HeaderLogo {...props} />,
+                          headerLeft: (props) => <BackArrow {...props} />,
                         }}
                       >
                         {(props) => <RoomScreen {...props} />}

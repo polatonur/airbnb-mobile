@@ -4,7 +4,6 @@ import {
   FlatList,
   Text,
   View,
-  ActivityIndicator,
   Image,
   StyleSheet,
   ScrollView,
@@ -14,6 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Stars from "../components/Stars";
+import LottieView from "lottie-react-native";
 
 export default function HomeScreen() {
   const [isLoading, setIsLoading] = useState(true);
@@ -26,16 +26,22 @@ export default function HomeScreen() {
           "https://express-airbnb-api.herokuapp.com/rooms"
         );
         setData(response.data);
-        setIsLoading(false);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 2000);
       } catch (error) {
         console.log(error.message);
-        console.log("er");
       }
     };
     fetchData();
   }, []);
   return isLoading ? (
-    <ActivityIndicator />
+    <LottieView
+      source={require("../assets/lottie.json")}
+      // colorFilters={[{ color: "tomato" }]}
+      autoPlay
+      loop
+    />
   ) : (
     <View style={styles.main}>
       <StatusBar

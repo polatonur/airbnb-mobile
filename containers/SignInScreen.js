@@ -1,6 +1,8 @@
 import React from "react";
 import { useNavigation } from "@react-navigation/core";
 import Constants from "expo-constants";
+import { FontAwesome } from "@expo/vector-icons";
+
 import {
   Image,
   Text,
@@ -12,32 +14,49 @@ import {
   StyleSheet,
   SafeAreaView,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useState } from "react";
 import axios from "axios";
+import { set } from "react-native-reanimated";
 
 const SignInScreen = ({ setToken }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [displayPass, setDisplayPass] = useState(false);
+  const [activity, setActivity] = useState(false);
 
   const navigation = useNavigation();
 
   const handleSignin = async () => {
-    const params = {
-      email: email,
-      password: password,
-    };
-    try {
-      const response = await axios.post(
-        "https://express-airbnb-api.herokuapp.com/user/log_in",
-        params
-      );
-      console.log(response.data.token);
-      setToken(response.data.token);
-    } catch (error) {
-      console.log(error.message);
+    if (password && email) {
+      setActivity(true);
+      const params = {
+        email: email,
+        password: password,
+      };
+      try {
+        const response = await axios.post(
+          "https://express-airbnb-api.herokuapp.com/user/log_in",
+          params
+        );
+        console.log(response.data.token);
+        setToken(response.data.token);
+        setMessage("");
+      } catch (error) {
+        if (error.response.status === 401) {
+          setMessage("User not found");
+        } else {
+          setMessage("An error occured");
+        }
+
+        console.log(error.response);
+      }
+      setActivity(false);
+    } else {
+      setMessage("Please fill in all fiels ");
     }
   };
   return (
@@ -55,25 +74,42 @@ const SignInScreen = ({ setToken }) => {
           </View>
           <View style={styles.form}>
             <TextInput
+              value={email}
               placeholder="email"
               style={styles.input}
               onChangeText={(text) => {
                 setEmail(text);
               }}
             />
-            <TextInput
-              placeholder="password"
-              style={styles.input}
-              secureTextEntry={true}
-              onChangeText={(text) => {
-                setPassword(text);
-              }}
-            />
+            <View style={{ position: "relative", width: "100%" }}>
+              <TextInput
+                value={password}
+                placeholder="password"
+                style={styles.input}
+                secureTextEntry={displayPass ? false : true}
+                onChangeText={(text) => {
+                  setPassword(text);
+                }}
+              />
+              <FontAwesome
+                style={styles.eye}
+                name={displayPass ? "eye-slash" : "eye"}
+                size={20}
+                color="grey"
+                onPress={() => {
+                  setDisplayPass(!displayPass);
+                }}
+              />
+            </View>
           </View>
           <View>
-            <TouchableOpacity style={styles.btn} onPress={handleSignin}>
+            {!activity ? (
               <Text style={styles.message}>{message}</Text>
+            ) : (
+              <ActivityIndicator />
+            )}
 
+            <TouchableOpacity style={styles.btn} onPress={handleSignin}>
               <Text style={styles.signin_btn}>Sign in</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -123,7 +159,6 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   input: {
-    textTransform: "lowercase",
     width: "100%",
     borderBottomColor: "#FFBAC0",
     borderBottomWidth: 2,
@@ -145,8 +180,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   signin_btn: {
+    paddingVertical: 10,
     fontSize: 15,
-    paddingBottom: 18,
   },
   btn: {
     justifyContent: "center",
@@ -159,5 +194,14 @@ const styles = StyleSheet.create({
   },
   bottom_text: {
     marginTop: 20,
+  },
+  eye: {
+    position: "absolute",
+    right: 2,
+    top: 8,
+  },
+  message: {
+    color: "red",
+    fontSize: 20,
   },
 });

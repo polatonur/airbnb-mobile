@@ -11,26 +11,26 @@ const Map = ({ location, array }) => {
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
 
-  useEffect(() => {
-    const getPermission = async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        console.log(status);
+  // useEffect(() => {
+  //   const getPermission = async () => {
+  //     try {
+  //       const { status } = await Location.requestForegroundPermissionsAsync();
+  //       console.log(status);
 
-        if (status === "granted") {
-          const location = await Location.getCurrentPositionAsync();
-          setLatitude(location.coords.latitude);
-          setLongitude(location.coords.longitude);
-        } else {
-          alert("Permission refusée");
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  //       if (status === "granted") {
+  //         const location = await Location.getCurrentPositionAsync();
+  //         setLatitude(location.coords.latitude);
+  //         setLongitude(location.coords.longitude);
+  //       } else {
+  //         alert("Permission refusée");
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
 
-    getPermission();
-  }, []);
+  //   getPermission();
+  // }, []);
 
   return (
     <View>

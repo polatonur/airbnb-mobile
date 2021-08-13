@@ -4,6 +4,7 @@ import { useState } from "react";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Constants from "expo-constants";
 import axios from "axios";
+import { FontAwesome } from "@expo/vector-icons";
 
 import {
   StatusBar,
@@ -15,6 +16,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
 
 const SignUpScreen = ({ setToken }) => {
@@ -24,13 +26,17 @@ const SignUpScreen = ({ setToken }) => {
   const [describe, setDescribe] = useState("");
   const [confirm, setConfirm] = useState("");
   const [message, setMessage] = useState("");
+  const [displayPass, setDisplayPass] = useState(false);
+  const [activity, setActivity] = useState(false);
   console.log(
     `email:${email} username:${username} password:${password} desc:${describe}`
   );
   const navigation = useNavigation();
 
   const handleSignup = async () => {
-    if (!(username || email || password || describe || confirm)) {
+    setActivity(true);
+    console.log(!username || !email || !password || !describe || !confirm);
+    if (!username || !email || !password || !describe || !confirm) {
       setMessage("Fill in all fields");
     } else if (password !== confirm) {
       setMessage("Passwords doesn't match");
@@ -49,11 +55,21 @@ const SignUpScreen = ({ setToken }) => {
         console.log("post");
         console.log(response.data);
         setToken(response.data.token);
+        setMessage("");
       } catch (error) {
-        console.log("err");
-        console.log(error.message);
+        console.log("error");
+        if (
+          error.response.data.error ===
+            "This username already has an account." ||
+          error.response.data.error === "This email already has an account."
+        ) {
+          setMessage(error.response.data.error);
+        } else {
+          setMessage("An error occurred");
+        }
       }
     }
+    setActivity(false);
   };
   return (
     // <KeyboardAwareScrollView>
@@ -63,6 +79,7 @@ const SignUpScreen = ({ setToken }) => {
         <View style={styles.main}>
           <Image style={styles.logo} source={require("../assets/airbnb.png")} />
           <Text style={styles.signup}>Sign Up</Text>
+
           <TextInput
             style={styles.input}
             placeholder="email"
@@ -70,7 +87,9 @@ const SignUpScreen = ({ setToken }) => {
               setEmail(text);
             }}
           />
+
           <TextInput
+            value={username}
             style={styles.input}
             placeholder="username"
             onChangeText={(text) => {
@@ -78,6 +97,7 @@ const SignUpScreen = ({ setToken }) => {
             }}
           />
           <TextInput
+            value={describe}
             style={styles.describe}
             placeholder="Describe yoursels in few words"
             multiline={true}
@@ -86,23 +106,51 @@ const SignUpScreen = ({ setToken }) => {
               setDescribe(text);
             }}
           />
-          <TextInput
-            onChangeText={(text) => {
-              setPassword(text);
-            }}
-            style={styles.input}
-            placeholder="password"
-            secureTextEntry={true}
-          />
-          <TextInput
-            onChangeText={(text) => {
-              setConfirm(text);
-            }}
-            style={styles.input}
-            placeholder="confirm password"
-            secureTextEntry={true}
-          />
-          <Text style={styles.message}>{message}</Text>
+          <View style={{ position: "relative", width: "100%" }}>
+            <TextInput
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+              }}
+              style={styles.input}
+              placeholder="password"
+              secureTextEntry={displayPass ? false : true}
+            />
+            <FontAwesome
+              style={styles.eye}
+              name={displayPass ? "eye-slash" : "eye"}
+              size={20}
+              color="grey"
+              onPress={() => {
+                setDisplayPass(!displayPass);
+              }}
+            />
+          </View>
+          <View style={{ position: "relative", width: "100%" }}>
+            <TextInput
+              value={confirm}
+              onChangeText={(text) => {
+                setConfirm(text);
+              }}
+              style={styles.input}
+              placeholder="confirm password"
+              secureTextEntry={displayPass ? false : true}
+            />
+            <FontAwesome
+              style={styles.eye}
+              name={displayPass ? "eye-slash" : "eye"}
+              size={20}
+              color="grey"
+              onPress={() => {
+                setDisplayPass(!displayPass);
+              }}
+            />
+          </View>
+          {!activity ? (
+            <Text style={styles.message}>{message}</Text>
+          ) : (
+            <ActivityIndicator />
+          )}
           <TouchableOpacity style={styles.btn} onPress={handleSignup}>
             <Text style={styles.signup_btn}>Sign Up</Text>
           </TouchableOpacity>
@@ -125,6 +173,11 @@ const SignUpScreen = ({ setToken }) => {
 export default SignUpScreen;
 
 const styles = StyleSheet.create({
+  eye: {
+    position: "absolute",
+    right: 2,
+    top: 8,
+  },
   safeAreaView: {
     backgroundColor: "white",
   },
@@ -148,7 +201,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   input: {
-    textTransform: "lowercase",
     width: "100%",
     borderBottomColor: "#FFBAC0",
     borderBottomWidth: 2,
@@ -186,5 +238,9 @@ const styles = StyleSheet.create({
   bottom_text: {
     marginTop: 20,
     marginBottom: 30,
+  },
+  message: {
+    color: "red",
+    fontSize: 20,
   },
 });

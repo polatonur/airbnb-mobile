@@ -19,7 +19,6 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useState } from "react";
 import axios from "axios";
-import { set } from "react-native-reanimated";
 
 const SignInScreen = ({ setToken }) => {
   const [email, setEmail] = useState("");
@@ -30,7 +29,7 @@ const SignInScreen = ({ setToken }) => {
 
   const navigation = useNavigation();
 
-  const handleSignin = async () => {
+  const handleSignin = async (props) => {
     if (password && email) {
       setActivity(true);
       const params = {
@@ -42,8 +41,8 @@ const SignInScreen = ({ setToken }) => {
           "https://express-airbnb-api.herokuapp.com/user/log_in",
           params
         );
-        console.log(response.data.token);
-        setToken(response.data.token);
+        console.log(response.data);
+        setToken(response.data.token, response.data.id);
         setMessage("");
       } catch (error) {
         if (error.response.status === 401) {
@@ -60,7 +59,9 @@ const SignInScreen = ({ setToken }) => {
     }
   };
   return (
-    // <KeyboardAwareScrollView>
+    // <KeyboardAwareScrollView
+    //   keyboardOpeningTime={Number.MAX_SAFE_INTEGER}
+    // >
     <SafeAreaView style={styles.safeAreaView}>
       <ScrollView style={styles.scrollView}>
         <StatusBar style="dark" />

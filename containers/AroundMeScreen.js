@@ -36,6 +36,7 @@ const AroundMe = () => {
           setPermision(true);
         } else {
           alert("acces denied");
+          fetchData("", "");
         }
       } catch (error) {
         console.log(error);
@@ -75,8 +76,8 @@ const AroundMe = () => {
         showsUserLocation={true}
         style={styles.map}
         initialRegion={{
-          latitude: latitude,
-          longitude: longitude,
+          latitude: latitude || 48.83759287415216,
+          longitude: longitude || 2.2811258344429417,
           latitudeDelta: 0.2,
           longitudeDelta: 0.2,
         }}

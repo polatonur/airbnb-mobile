@@ -8,7 +8,7 @@ import HomeScreen from "./containers/HomeScreen";
 import ProfileScreen from "./containers/ProfileScreen";
 import SignInScreen from "./containers/SignInScreen";
 import SignUpScreen from "./containers/SignUpScreen";
-import SettingsScreen from "./containers/SettingsScreen";
+import SettingsScreen from "./containers/MyProfileScreen";
 import HeaderLogo from "./components/HaeaderLogo";
 import RoomScreen from "./containers/RoomScreen";
 import AroundMe from "./containers/AroundMeScreen";
@@ -21,12 +21,15 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [userToken, setUserToken] = useState(null);
 
-  const setToken = async (token) => {
+  const setToken = async (token, id) => {
+    console.log(`token:${token} id:${id}`);
     console.log("token");
     if (token) {
+      AsyncStorage.setItem("userId", id);
       AsyncStorage.setItem("userToken", token);
     } else {
       AsyncStorage.removeItem("userToken");
+      AsyncStorage.removeItem("userId");
     }
 
     setUserToken(token);
@@ -141,9 +144,9 @@ export default function App() {
                   )}
                 </Tab.Screen>
                 <Tab.Screen
-                  name="Settings"
+                  name="My profile"
                   options={{
-                    tabBarLabel: "Settings",
+                    tabBarLabel: "My profile",
                     tabBarIcon: ({ color, size }) => (
                       <MaterialCommunityIcons
                         name="account-outline"
@@ -156,8 +159,10 @@ export default function App() {
                   {() => (
                     <Stack.Navigator>
                       <Stack.Screen
-                        name="Settings"
-                        options={{ title: "Settings", tabBarLabel: "Settings" }}
+                        name="MyProfile"
+                        options={{
+                          headerTitle: (props) => <HeaderLogo {...props} />,
+                        }}
                       >
                         {() => <SettingsScreen setToken={setToken} />}
                       </Stack.Screen>

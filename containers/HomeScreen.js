@@ -36,12 +36,7 @@ export default function HomeScreen() {
     fetchData();
   }, []);
   return isLoading ? (
-    <LottieView
-      source={require("../assets/lottie.json")}
-      // colorFilters={[{ color: "tomato" }]}
-      autoPlay
-      loop
-    />
+    <LottieView source={require("../assets/lottie.json")} autoPlay loop />
   ) : (
     <View style={styles.main}>
       <StatusBar

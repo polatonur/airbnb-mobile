@@ -54,7 +54,7 @@ const SignUpScreen = ({ setToken }) => {
         );
         console.log("post");
         console.log(response.data);
-        setToken(response.data.token);
+        setToken(response.data.token, response.data.id);
         setMessage("");
       } catch (error) {
         console.log("error");
@@ -72,7 +72,9 @@ const SignUpScreen = ({ setToken }) => {
     setActivity(false);
   };
   return (
-    // <KeyboardAwareScrollView>
+    // <KeyboardAwareScrollView
+    //   keyboardOpeningTime={Number.MAX_SAFE_INTEGER}
+    // >
     <SafeAreaView style={styles.safeAreaView}>
       <ScrollView style={styles.scrollView}>
         <StatusBar style="dark" />
